@@ -2,7 +2,7 @@
 .idea/
 __pycache__/
 
-data/
+src/process/
 models/
 reports/
 
