@@ -1,0 +1,11 @@
+.venv/
+.idea/
+__pycache__/
+
+data/
+models/
+reports/
+
+.env
+/portfolio.csv
+/state.json
