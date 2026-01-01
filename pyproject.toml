@@ -18,5 +18,8 @@ classifiers = [
 
 dependencies = [
     "ccxt",
-    "python-dotenv"
+    "pandas",
+    "numpy",
+    "python-dotenv",
+    "pyyaml"
 ]

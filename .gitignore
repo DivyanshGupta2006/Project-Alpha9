@@ -2,7 +2,7 @@
 .idea/
 __pycache__/
 
-src/pipeline/
+data/
 models/
 reports/
 
