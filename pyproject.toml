@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Alpha9"
+version = "1.0.0"
+authors = [
+  { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
+]
+description = "An autonomous multi-asset trading agent"
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+
+dependencies = [
+    "ccxt",
+    "python-dotenv"
+]
