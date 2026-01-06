@@ -8,7 +8,7 @@ version = "1.0.0"
 authors = [
   { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
 ]
-description = "An autonomous multi-asset trading agent"
+description = "An autonomous multi-asset trading agent for crypto"
 readme = "README.md"
 requires-python = ">=3.13"
 classifiers = [

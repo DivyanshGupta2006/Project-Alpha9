@@ -2,6 +2,7 @@ import ccxt
 import time
 import pandas as pd
 
+# OPTIMIZED
 def download(exchange,
              symbols,
              timeframe,
