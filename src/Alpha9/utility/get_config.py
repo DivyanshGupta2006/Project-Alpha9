@@ -1,6 +1,6 @@
 import yaml
 
-from src.utility import get_path
+from src.Alpha9.utility import get_path
 
 config_path = get_path.absolute('config.yaml')
 with open(config_path, 'r') as f:

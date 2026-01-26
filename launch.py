@@ -1,4 +1,4 @@
-from src import main
+from src.Alpha9 import main
 
 # OPTIMIZED
 if __name__ == '__main__':

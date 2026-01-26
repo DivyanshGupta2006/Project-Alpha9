@@ -6,7 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "Alpha9"
 version = "1.0.0"
 authors = [
-  { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
+    { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
+    { name="Sarath Chandra Jandhyala", email=""},
+    { name="Aayush Sharma", email=""}
 ]
 description = "An autonomous multi-asset trading agent for crypto"
 readme = "README.md"
@@ -18,8 +20,18 @@ classifiers = [
 
 dependencies = [
     "ccxt",
+    "ta-lib",
     "pandas",
     "numpy",
+    "matplotlib",
+    "seaborn",
+    "statsmodels",
     "python-dotenv",
     "pyyaml"
 ]
+
+[project.urls]
+"Github" = "https://github.com/DivyanshGupta2006/Project-Alpha9"
+
+[project.scripts]
+Alpha9 = "Alpha9.launch:main"

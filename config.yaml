@@ -14,7 +14,6 @@ pipeline:
     - 'BTC/USDT'
     - 'ETH/USDT'
     - 'SOL/USDT'
-    - 'XRP/USDT'
 
   timeframe: '1h'
 
@@ -27,5 +26,3 @@ pipeline:
   validation_end_date: '2025-06-30'
   testing_start_date: '2025-07-01'
   testing_end_date: '2025-12-31'
-
-  linking_window_length: 500

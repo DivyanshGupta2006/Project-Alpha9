@@ -1,8 +1,8 @@
-from src.utility import get_config, get_path
+from src.Alpha9.utility import get_config, get_path
 
 config = get_config.load()
 
-def update():
+def run():
     # load and handle paths
     raw_data_dir = get_path.absolute(config['path']['data']['raw'])
     get_path.check(raw_data_dir)
@@ -16,7 +16,7 @@ def update():
 
     choice = input('Download the data [y/n] : ')
     if choice.lower() == 'y':
-        from src.pipeline import download_data
+        from src.Alpha9.pipeline import download_data
         print("Please wait...\nThis may take a while...")
         status = download_data.download(exchange, symbols, timeframe, start_date, end_date, raw_data_dir)
         if status == 'Success':
