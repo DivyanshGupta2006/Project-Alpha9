@@ -2,12 +2,15 @@
 path:
   data:
     raw: 'data/raw/'
+    featured: 'data/featured/'
     training: 'data/training'
     validation: 'data/validation'
     testing: 'data/testing'
 
 # constants related to pipeline package handling data
 pipeline:
+
+  # constants related to downloading the data
   exchange: 'binance'
   symbols:
     - 'BNB/USDT'
@@ -26,3 +29,11 @@ pipeline:
   validation_end_date: '2025-06-30'
   testing_start_date: '2025-07-01'
   testing_end_date: '2025-12-31'
+
+  # constants related to feature engineering
+  timeperiod_cat: 3
+  timeperiod_cat0: 9
+  timeperiod_cat1: 12
+  timeperiod_cat2: 14
+  timeperiod_cat3: 26
+  timeperiod_cat4: 50
