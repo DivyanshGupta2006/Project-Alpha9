@@ -3,9 +3,9 @@ path:
   data:
     raw: 'data/raw/'
     featured: 'data/featured/'
-    training: 'data/training'
-    validation: 'data/validation'
-    testing: 'data/testing'
+    train: 'data/training'
+    val: 'data/validation'
+    test: 'data/testing'
 
 # constants related to pipeline package handling data
 pipeline:
@@ -23,13 +23,6 @@ pipeline:
   start_date: '2020-06-01'
   end_date: '2025-12-31'
 
-  training_start_date: '2021-01-01'
-  training_end_date: '2024-12-31'
-  validation_start_date: '2025-01-01'
-  validation_end_date: '2025-06-30'
-  testing_start_date: '2025-07-01'
-  testing_end_date: '2025-12-31'
-
   # constants related to feature engineering
   timeperiod_cat: 3
   timeperiod_cat0: 9
@@ -37,3 +30,28 @@ pipeline:
   timeperiod_cat2: 14
   timeperiod_cat3: 26
   timeperiod_cat4: 50
+  selected_features:
+    - 'macd-signal-pct'
+    - 'macd-slope'
+    - 'sar'
+    - 'tema'
+    - 'ppo'
+    - 'lin-reg-slope'
+    - 'ichi-cloud-trend'
+    - 'rsi'
+    - 'stoch-osc-slowk'
+    - 'adx'
+    - 'stoch-rsi'
+    - 'bop'
+    - 'natr'
+    - 'obv'
+    - 'vwap'
+    - 'mfi'
+    - 'log-return'
+    - 'vol-spike'
+    - 'norm-volatility'
+
+  # constants related to merge & split
+  train_start_date: '2021-01-01'
+  val_start_date: '2025-01-01'
+  test_start_date: '2025-07-01'
