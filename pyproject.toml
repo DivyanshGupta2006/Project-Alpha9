@@ -7,8 +7,8 @@ name = "Alpha9"
 version = "1.0.0"
 authors = [
     { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
-    { name="Sarath Chandra Jandhyala", email=""},
-    { name="Aayush Sharma", email=""}
+    { name="Sarath Chandra Jandhyala", email="user@example.com" },
+    { name="Aayush Sharma", email="user@example.com" }
 ]
 description = "An autonomous multi-asset trading agent for crypto"
 readme = "README.md"
@@ -27,11 +27,14 @@ dependencies = [
     "seaborn",
     "statsmodels",
     "python-dotenv",
-    "pyyaml"
+    "pyyaml",
+    "torch",
+    "torchvision",
+    "torchaudio"
 ]
 
 [project.urls]
 "Github" = "https://github.com/DivyanshGupta2006/Project-Alpha9"
 
 [project.scripts]
-Alpha9 = "Alpha9.launch:main"
+Alpha9 = "Alpha9.main:start"

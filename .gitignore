@@ -5,6 +5,7 @@ __pycache__/
 data/
 models/
 reports/
+assets/
 
 .env
 /portfolio.csv

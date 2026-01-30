@@ -55,3 +55,6 @@ pipeline:
   train_start_date: '2021-01-01'
   val_start_date: '2025-01-01'
   test_start_date: '2025-07-01'
+
+# constants related to strategy package handling strategy
+strategy:
