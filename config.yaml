@@ -35,6 +35,11 @@ pipeline:
   timeperiod_cat3: 26
   timeperiod_cat4: 50
   selected_features:
+    - 'open'
+    - 'high'
+    - 'low'
+    - 'close'
+    - 'volume'
     - 'macd-signal-pct'
     - 'macd-slope'
     - 'sar'
