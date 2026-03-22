@@ -16,3 +16,11 @@ class DataHandler:
 
     def update_candles(self):
         pass
+
+class Strategy:
+    def calculate_fiducia(self, event):
+        pass
+
+class Exchange:
+    def execute_order(self, event):
+        pass
