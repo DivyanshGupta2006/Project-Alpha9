@@ -1,26 +1,36 @@
-class DataHandler:
+import abc
+
+class DataHandler(abc.ABC):
+    @abc.abstractmethod
     def get_latest_candle(self):
-        pass
+        raise NotImplementedError("Should implement get_latest_candle()")
 
+    @abc.abstractmethod
     def get_latest_candles(self, N=1):
-        pass
+        raise NotImplementedError("Should implement get_latest_candles()")
 
+    @abc.abstractmethod
     def get_latest_candle_datetime(self):
-        pass
+        raise NotImplementedError("Should implement get_latest_candle_datetime()")
 
+    @abc.abstractmethod
     def get_latest_candle_value(self, val):
-        pass
+        raise NotImplementedError("Should implement get_latest_candle_value()")
 
+    @abc.abstractmethod
     def get_latest_candles_value(self, val, N=1):
-        pass
+        raise NotImplementedError("Should implement get_latest_candles_value()")
 
+    @abc.abstractmethod
     def update_candles(self):
-        pass
+        raise NotImplementedError("Should implement update_candles()")
 
-class Strategy:
+class Strategy(abc.ABC):
+    @abc.abstractmethod
     def calculate_fiducia(self, event):
-        pass
+        raise NotImplementedError("Should implement calculate_fiducia()")
 
-class Exchange:
+class Exchange(abc.ABC):
+    @abc.abstractmethod
     def execute_order(self, event):
-        pass
+        raise NotImplementedError("Should implement execute_order()")
