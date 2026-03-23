@@ -25,7 +25,7 @@ class DataHandler(abc.ABC):
     def update_candles(self):
         raise NotImplementedError("Should implement update_candles()")
 
-class Strategy(abc.ABC):
+class AbstractStrategy(abc.ABC):
     @abc.abstractmethod
     def calculate_fiducia(self, event):
         raise NotImplementedError("Should implement calculate_fiducia()")

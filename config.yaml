@@ -11,6 +11,9 @@ path:
 backtest:
   capital: 1000000
 
+market:
+  transaction_cost_fraction: 0.001
+
 # constants related to pipeline package handling data
 pipeline:
 
@@ -69,14 +72,13 @@ pipeline:
 strategy:
 
   # constants related to position subpackage handling position sizing
-  slippage_cost_fraction: 0.001
-  transaction_cost_fraction: 0.001
   bankruptcy_fraction: 0.05
 
   # constants related to risk subpackage handling risk management
-  stop_loss_multiple: 3
+  slippage_cost_fraction: 0.001
+  stop_loss_price_fraction: 0.05
   stop_loss_portion: 0.8
-  take_profit_multiple: 4.5
+  take_profit_price_fraction: 0.05
   take_profit_portion: 0.8
 
   # other constants related to strategy package
