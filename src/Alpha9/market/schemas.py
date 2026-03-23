@@ -1,6 +1,6 @@
 import abc
 
-class DataHandler(abc.ABC):
+class AbstractDataHandler(abc.ABC):
     @abc.abstractmethod
     def get_latest_candle(self):
         raise NotImplementedError("Should implement get_latest_candle()")
@@ -30,7 +30,7 @@ class AbstractStrategy(abc.ABC):
     def calculate_fiducia(self, event):
         raise NotImplementedError("Should implement calculate_fiducia()")
 
-class Exchange(abc.ABC):
+class AbstractExchange(abc.ABC):
     @abc.abstractmethod
     def execute_order(self, event):
         raise NotImplementedError("Should implement execute_order()")
