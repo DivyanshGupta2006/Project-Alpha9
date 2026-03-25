@@ -1,7 +1,7 @@
 from Alpha9.market.events import OrderEvent
 
 class Portfolio:
-    def __init__(self, symbols, data_handler, risk_manager, start_date, initial_capital, bankrupt_fraction):
+    def __init__(self, symbols, data_handler, risk_manager, start_date, initial_capital, bankrupt_fraction, equity_data_path):
         self.symbols = symbols
         self.data_handler = data_handler
         self.risk_manager = risk_manager
@@ -11,6 +11,8 @@ class Portfolio:
         self.current_portfolio = {}
         self.cash = self.initial_capital
         self.total_transaction_cost = 0.0
+
+        self.equity_data_path = equity_data_path
 
         self.all_portfolios = []
         self.bankrupt_threshold = initial_capital * bankrupt_fraction
@@ -48,7 +50,7 @@ class Portfolio:
             total_equity = total_value + self.cash
             self._record_portfolio(timestamp, total_equity)
 
-    def _calculate_order_amount(self, event):
+    def _sanitize(self, event):
         order_amount = {}
 
 
@@ -56,7 +58,7 @@ class Portfolio:
 
     def _generate_order(self, event):
         timestamp = event.timestamp
-        order_amounts = self._calculate_order_amount(event)
+        order_amounts = self._sanitize(event)
         description = {}
 
         order_prices = self.risk_manager.calculate_order_prices(event)
@@ -93,3 +95,6 @@ class Portfolio:
 
             for symbol in self.symbols:
                 self.current_portfolio[symbol]=description["symbol"]
+
+    def save_equity_data(self):
+        pass
