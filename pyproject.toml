@@ -7,7 +7,7 @@ name = "Alpha9"
 version = "1.0.0"
 authors = [
     { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
-    { name="Sarath Chandra Jandhyala", email="user@example.com" },
+    { name="Sarath Chandra Jandhyala", email="sarathj2006@gmail.com" },
     { name="Aayush Sharma", email="user@example.com" }
 ]
 description = "An autonomous multi-asset trading agent for crypto"
