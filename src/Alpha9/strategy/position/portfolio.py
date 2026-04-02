@@ -10,23 +10,36 @@ class Portfolio:
         self.risk_manager = risk_manager
         self.start_date = start_date
         self.initial_capital = float(initial_capital)
-
-        self.current_portfolio = {}
-        self.cash = self.initial_capital
-        self.total_transaction_cost = 0.0
-
         self.equity_data_path = equity_data_path
 
+        self.current_portfolio = {}
+        for symbol in self.symbols:
+            self.current_portfolio[symbol] = {
+                'amount': 0,
+                'cost-basis': 0,
+                'stop-loss': {
+                    'price': 0,
+                    'portion': 0
+                },
+                'take-profit': {
+                    'price': 0,
+                    'portion': 0
+                }
+            }
+        self.cash = self.initial_capital
+        self.total_transaction_cost = 0.0
         self.all_portfolios = []
         self.bankrupt_threshold = initial_capital * bankrupt_fraction
         self.bankrupt = False
+
+        self._record_portfolio(pd.Timestamp(self.start_date), self._calculate_portfolio_value())
 
     def _record_portfolio(self, timestamp, total_equity):
         portfolio = {
             "timestamp": timestamp,
             "cash": self.cash,
-            "total_equity": total_equity,
-            "total_transaction_cost": self.total_transaction_cost,
+            "tota-equity": total_equity,
+            "total-transaction-cost": self.total_transaction_cost,
             "portfolio": self.current_portfolio,
         }
         self.all_portfolios.append(portfolio)
@@ -83,13 +96,12 @@ class Portfolio:
                     "take-profit": brackets['take profit'][symbol]
                 }
             order = OrderEvent(timestamp, description)
-            return order
+            self.event_queue.put_event(order)
         else:
             return None
 
     def update_fill(self, event):
         if event.type == "FILL":
-            timestamp = event.timestamp
             description = event.description
             cash_change = event.cash_change
             transaction_cost = event.transaction_cost
