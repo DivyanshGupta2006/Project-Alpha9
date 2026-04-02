@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from Alpha9.utility import get_config, get_path
+from src.Alpha9.utility import get_config, get_path
 
 config = get_config.load()
 

@@ -1,7 +1,6 @@
 import torch
-from collections import deque
 
-from src.Alpha9.market import events
+from src.Alpha9.market.events import SignalEvent
 from src.Alpha9.market.schemas import AbstractStrategy
 from src.Alpha9.strategy.model import Model
 
@@ -12,33 +11,33 @@ class Strategy(AbstractStrategy):
         self.model = model
         self.symbols = symbols
         self.seq_length = seq_length
-        self.state_deque = deque(maxlen=seq_length)
         self.device = device
 
         self._candles_available = False
 
     def calculate_fiducia(self, event):
-        print("Calculating fiducia...")
         if event.type == "MARKET":
             current_timestamp = event.timestamp
-            candle = self.data_handler.get_latest_candle()
-            self.state_deque.append(candle)
-            if len(self.state_deque) < self.seq_length:
-                return []
-            torch.tensor(list(self.state_deque))
+            candles = self.data_handler.get_latest_candles(self.seq_length)
+            if len(candles) < self.seq_length:
+                return None
+
             # Passing it in the Model now.
-            state_tensor = torch.tensor(self.state_deque)
-            state_tensor = state_tensor.to(self.device)
+            state_tensor = torch.tensor(candles.values).to(self.device)
 
             # Reshape the tensor to pass it in the model. Shape (1,SEQ_LENGTH, FEATURES)
-            total_features = state_tensor.shape[1]
-            model_input = state_tensor.reshape((1,self.seq_length,total_features))
+            model_input = state_tensor.reshape((1,self.seq_length, state_tensor.shape[1]))
 
-            fiducia = Model.predict(model_input)
+            fiducia = self.model.forward(model_input)
             fiducia = fiducia.reshape(-1)
 
-            # Broadcast the signal event
-            self.__broadcast_signal_event(current_timestamp, fiducia)
+            fiducia_dict = {}
+            for symbol in self.symbols:
+                for val in fiducia.tolist():
+                    fiducia_dict[symbol] = val
 
+            # Broadcast the signal event
+            signal = SignalEvent(current_timestamp, fiducia_dict)
+            self.event_queue.put_event(signal)
 
 

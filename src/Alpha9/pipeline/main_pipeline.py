@@ -1,5 +1,5 @@
-from Alpha9.pipeline import feature_engineer, merge_split_data
-from Alpha9.utility import get_config, get_path, read_file
+from src.Alpha9.pipeline import feature_engineer, merge_split_data
+from src.Alpha9.utility import get_config, get_path, read_file
 
 config = get_config.load()
 

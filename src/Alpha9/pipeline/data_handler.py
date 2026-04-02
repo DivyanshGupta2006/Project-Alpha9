@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from Alpha9.market.events import MarketEvent
+from src.Alpha9.market.events import MarketEvent
 from src.Alpha9.market.schemas import AbstractDataHandler
 
 sns.set_theme(style="darkgrid")
