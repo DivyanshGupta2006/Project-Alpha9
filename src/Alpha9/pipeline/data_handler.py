@@ -1,8 +1,11 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from Alpha9.market.events import MarketEvent
 from src.Alpha9.market.schemas import AbstractDataHandler
 
+sns.set_theme(style="darkgrid")
 
 class DataHandler(AbstractDataHandler):
     def __init__(self, data, symbols, event_queue, start_date, end_date):
@@ -81,3 +84,17 @@ class DataHandler(AbstractDataHandler):
         if not latest_candles.empty and val in latest_candles.columns:
             return latest_candles[val]
         return pd.Series(dtype=float)
+
+    def visualize_data(self, val):
+        fig, ax = plt.subplots(figsize=(14, 7))
+        for symbol in self.symbols:
+            if not self.data.empty and f"('{val}', '{symbol}')" in self.data.columns:
+                ax.plot(self.data.index, self.data[f"('{val}', '{symbol}')"], label=symbol)
+        ax.set_title('Closing Prices vs Date')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Close Price (USD)')
+        ax.legend()
+        ax.grid(True)
+        fig.tight_layout()
+        plt.show()
+        plt.close(fig)

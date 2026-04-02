@@ -1,42 +1,23 @@
-from src.Alpha9.market import schemas,events
-from collections import deque
 import torch
+from collections import deque
+
+from src.Alpha9.market import events
+from src.Alpha9.market.schemas import AbstractStrategy
 from src.Alpha9.strategy.model import Model
 
-from src.Alpha9.market.events import MarketEvent
-from src.Alpha9.pipeline.data_handler import DataHandler
-
-
-class Strategy(schemas.AbstractStrategy):
-    """
-    This Strategy needs more documentation, we don't know how to describe this part. Hence, I will now leave this
-    empty at the moment.
-    """
-    def __init__(self,event_queue,model,data_handler:DataHandler,symbols,seq_length):
-        """
-        Initialises the strategy.
-        Parameters:
-        events_queue - The events queue instance.
-        data_handler - The data handler instance.
-        symbols - A list of symbols traded by the strategy.
-        seq_length - The length of the sequence to consider for each signal.
-        """
-        self.event_queue = event_queue
+class Strategy(AbstractStrategy):
+    def __init__(self, data_handler, event_queue, model, symbols, seq_length, device):
         self.data_handler = data_handler
+        self.event_queue = event_queue
+        self.model = model
         self.symbols = symbols
         self.seq_length = seq_length
         self.state_deque = deque(maxlen=seq_length)
-        self.model = model
-        if torch.cuda.is_available():
-            self.device = torch.device('cuda')
-        else :
-            self.device = torch.device('cpu')
+        self.device = device
 
-    def __broadcast_signal_event(self,timestamp,fiducia):
-        event = events.SignalEvent(timestamp,fiducia)
-        self.event_queue.put(event)
+        self._candles_available = False
 
-    def calculate_fiducia(self,event):
+    def calculate_fiducia(self, event):
         print("Calculating fiducia...")
         if event.type == "MARKET":
             current_timestamp = event.timestamp
@@ -58,11 +39,6 @@ class Strategy(schemas.AbstractStrategy):
 
             # Broadcast the signal event
             self.__broadcast_signal_event(current_timestamp, fiducia)
-
-
-
-
-
 
 
 
