@@ -1,3 +1,4 @@
+import ast
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,6 +11,12 @@ sns.set_theme(style="darkgrid")
 class DataHandler(AbstractDataHandler):
     def __init__(self, data, symbols, event_queue, start_date, end_date):
         self.data = data.truncate(before=start_date, after=end_date)
+        cols = []
+        for col in self.data.columns:
+            if isinstance(col, str):
+                col = ast.literal_eval(col)
+            cols.append(col)
+        self.data.columns = cols
         self.symbols = symbols
         self.event_queue = event_queue
         self.start_date = start_date
@@ -88,8 +95,8 @@ class DataHandler(AbstractDataHandler):
     def visualize_data(self, val):
         fig, ax = plt.subplots(figsize=(14, 7))
         for symbol in self.symbols:
-            if not self.data.empty and f"('{val}', '{symbol}')" in self.data.columns:
-                ax.plot(self.data.index, self.data[f"('{val}', '{symbol}')"], label=symbol)
+            if not self.data.empty and (val, symbol) in self.data.columns:
+                ax.plot(self.data.index, self.data[(val, symbol)], label=symbol)
         ax.set_title('Closing Prices vs Date')
         ax.set_xlabel('Date')
         ax.set_ylabel('Close Price (USD)')

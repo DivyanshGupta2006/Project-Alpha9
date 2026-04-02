@@ -22,6 +22,9 @@ class Strategy(AbstractStrategy):
             if len(candles) < self.seq_length:
                 return None
 
+            cols_drop = [col for col in candles.columns if col[0].lower() in ['open', 'high', 'low', 'close', 'volume']]
+            candles = candles.drop(columns=cols_drop, errors='ignore')
+
             # Passing it in the Model now.
             state_tensor = torch.tensor(candles.values).to(self.device)
 
