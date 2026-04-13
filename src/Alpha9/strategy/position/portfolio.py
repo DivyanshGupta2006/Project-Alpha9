@@ -3,12 +3,11 @@ import pandas as pd
 from Alpha9.market.events import OrderEvent
 
 class Portfolio:
-    def __init__(self, symbols, data_handler, event_queue, risk_manager, start_date, initial_capital, bankrupt_fraction, equity_data_path):
+    def __init__(self, symbols, data_handler, event_queue, risk_manager, initial_capital, bankrupt_fraction, equity_data_path):
         self.symbols = symbols
         self.data_handler = data_handler
         self.event_queue = event_queue
         self.risk_manager = risk_manager
-        self.start_date = start_date
         self.initial_capital = float(initial_capital)
         self.equity_data_path = equity_data_path
 
@@ -32,7 +31,7 @@ class Portfolio:
         self.bankrupt_threshold = initial_capital * bankrupt_fraction
         self.bankrupt = False
 
-        self._record_portfolio(pd.Timestamp(self.start_date), self._calculate_portfolio_value())
+        self._record_portfolio(pd.Timestamp(self.data_handler.start_date), self._calculate_portfolio_value())
 
     def _record_portfolio(self, timestamp, total_equity):
         portfolio = {

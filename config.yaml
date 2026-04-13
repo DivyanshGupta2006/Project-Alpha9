@@ -7,9 +7,9 @@ path:
     val: 'data/validation'
     test: 'data/testing'
 
-# constants related to backtest package handling backtesting
-backtest:
-  capital: 1000000
+  strategy:
+    model: 'files/model/'
+    portfolio: 'files/portfolio'
 
 market:
   transaction_cost_fraction: 0.001
@@ -68,6 +68,10 @@ pipeline:
   val_start_date: '2025-01-01'
   test_start_date: '2025-07-01'
 
+# constants related to backtest package handling backtesting
+backtest:
+  capital: 1000000
+
 # constants related to strategy package handling strategy
 strategy:
 
@@ -76,10 +80,10 @@ strategy:
 
   # constants related to risk subpackage handling risk management
   slippage_cost_fraction: 0.001
-  stop_loss_price_fraction: 0.05
+  stop_loss_multiple: 2
   stop_loss_portion: 0.8
-  take_profit_price_fraction: 0.05
+  take_profit_multiple: 3
   take_profit_portion: 0.8
 
   # other constants related to strategy package
-
+  sequence_length: 72
