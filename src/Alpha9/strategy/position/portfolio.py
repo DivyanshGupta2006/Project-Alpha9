@@ -1,9 +1,22 @@
+import copy
+import math
+
 import pandas as pd
 
 from Alpha9.market.events import OrderEvent
 
+
 class Portfolio:
-    def __init__(self, symbols, data_handler, event_queue, risk_manager, initial_capital, bankrupt_fraction, equity_data_path):
+    def __init__(
+        self,
+        symbols,
+        data_handler,
+        event_queue,
+        risk_manager,
+        initial_capital,
+        bankrupt_fraction,
+        equity_data_path,
+    ):
         self.symbols = symbols
         self.data_handler = data_handler
         self.event_queue = event_queue
@@ -14,16 +27,9 @@ class Portfolio:
         self.current_portfolio = {}
         for symbol in self.symbols:
             self.current_portfolio[symbol] = {
-                'amount': 0,
-                'cost-basis': 0,
-                'stop-loss': {
-                    'price': 0,
-                    'portion': 0
-                },
-                'take-profit': {
-                    'price': 0,
-                    'portion': 0
-                }
+                "amount": 0,
+                "stop-loss": {"price": 0, "portion": 0},
+                "take-profit": {"price": 0, "portion": 0},
             }
         self.cash = self.initial_capital
         self.total_transaction_cost = 0.0
@@ -31,15 +37,13 @@ class Portfolio:
         self.bankrupt_threshold = initial_capital * bankrupt_fraction
         self.bankrupt = False
 
-        self._record_portfolio(pd.Timestamp(self.data_handler.start_date), self._calculate_portfolio_value())
-
     def _record_portfolio(self, timestamp, total_equity):
         portfolio = {
             "timestamp": timestamp,
             "cash": self.cash,
-            "tota-equity": total_equity,
+            "total-equity": total_equity,
             "total-transaction-cost": self.total_transaction_cost,
-            "portfolio": self.current_portfolio,
+            "portfolio": copy.deepcopy(self.current_portfolio),
         }
         self.all_portfolios.append(portfolio)
 
@@ -50,7 +54,9 @@ class Portfolio:
             amount = current["amount"]
 
             if amount != 0:
-                latest_price = self.data_handler.get_latest_candle_value('close')
+                latest_price = self.data_handler.get_latest_candle_value(
+                    ("close", symbol)
+                )
                 value = amount * latest_price
                 total_value += value
 
@@ -58,46 +64,72 @@ class Portfolio:
             self.bankrupt = True
         return total_value
 
+    def _check_brackets(self):
+        # TODO: Add a check for stop-loss and take-profit
+        pass
+
     def update_timeindex(self, event):
         if event.type == "MARKET":
             timestamp = event.timestamp
-            for symbol in self.symbols:
-                # TODO: Check for stop-loss and take profit
-                pass
-            total_value = self._calculate_portfolio_value()
-            total_equity = total_value + self.cash
-            self._record_portfolio(timestamp, total_equity)
+            self._check_brackets()
+            self._record_portfolio(timestamp, self._calculate_portfolio_value())
 
     def _sanitize(self, event):
-        order_amount = {}
+        sanitized_fiducia = {}
 
-        for symbol in self.symbols:
-            # TODO: calculate order amounts
-            pass
+        fiducia = event.fiducia.copy()
 
-        return order_amount
+        exposure_raw = fiducia.pop("EXPOSURE", 0.0)
+
+        if not fiducia:
+            return sanitized_fiducia
+
+        mean_score = sum(fiducia.values()) / len(fiducia)
+        fiducia = {k: v - mean_score for k, v in fiducia.items()}
+
+        longs = {k: max(v, 0) for k, v in fiducia.items()}
+        shorts = {k: abs(min(v, 0)) for k, v in fiducia.items()}
+
+        sum_longs = sum(longs.values())
+        sum_shorts = sum(shorts.values())
+
+        E = 1 / (1 + math.exp(-exposure_raw))
+
+        if sum_longs == 0 or sum_shorts == 0:
+            sanitized_fiducia = {k: 0.0 for k in fiducia.keys()}
+            return sanitized_fiducia
+
+        for k in fiducia.keys():
+            w_long = longs[k] / sum_longs
+            w_short = shorts[k] / sum_shorts
+            sanitized_fiducia[k] = (E * w_long) - (E * w_short)
+
+        return sanitized_fiducia
 
     def update_signal(self, event):
         if event.type == "SIGNAL":
             timestamp = event.timestamp
-            order_amounts = self._sanitize(event)
+            event.fiducia = self._sanitize(event)
             description = {}
 
-            order_prices = self.risk_manager.calculate_order_prices(event)
-            brackets = self.risk_manager.calculate_order_brackets(event)
+            order_info = self.risk_manager.calculate_order_info(
+                event,
+                self._calculate_portfolio_value() + self.cash,
+                self.current_portfolio,
+            )
+            brackets = self.risk_manager.calculate_order_brackets(order_info)
 
             for symbol in self.symbols:
                 description[symbol] = {
                     "timestamp": timestamp,
-                    "amount": order_amounts[symbol],
-                    "price": order_prices[symbol],
-                    "stop-loss": brackets['stop loss'][symbol],
-                    "take-profit": brackets['take profit'][symbol]
+                    "amount": order_info[symbol]["order_amount"],
+                    "price": order_info[symbol]["price"],
+                    "stop-loss": brackets["stop-loss"][symbol],
+                    "take-profit": brackets["take-profit"][symbol],
                 }
+
             order = OrderEvent(timestamp, description)
             self.event_queue.put_event(order)
-        else:
-            return None
 
     def update_fill(self, event):
         if event.type == "FILL":
@@ -110,16 +142,18 @@ class Portfolio:
 
             for symbol in self.symbols:
                 portfolio_ = description[symbol]
-                if abs(portfolio_["amount"]) < 1e-9:
+                if abs(portfolio_["amount"]) < 1e-8:
                     portfolio_["amount"] = 0
                 self.current_portfolio[symbol]["amount"] += portfolio_["amount"]
                 self.current_portfolio[symbol]["stop-loss"] = portfolio_["stop-loss"]
-                self.current_portfolio[symbol]["take-profit"] = portfolio_["take-profit"]
+                self.current_portfolio[symbol]["take-profit"] = portfolio_[
+                    "take-profit"
+                ]
 
     def save_equity_data(self):
         df = pd.DataFrame(self.all_portfolios)
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        df.set_index('timestamp', inplace=True)
-        df = df[~df.index.duplicated(keep='last')]
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        df.set_index("timestamp", inplace=True)
+        df = df[~df.index.duplicated(keep="last")]
         df.sort_index(inplace=True)
         df.to_csv(self.equity_data_path, index=True)

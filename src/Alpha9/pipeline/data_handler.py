@@ -1,12 +1,14 @@
 import ast
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
-from src.Alpha9.market.events import MarketEvent
-from src.Alpha9.market.schemas import AbstractDataHandler
+from Alpha9.market.events import MarketEvent
+from Alpha9.market.schemas import AbstractDataHandler
 
 sns.set_theme(style="darkgrid")
+
 
 class DataHandler(AbstractDataHandler):
     def __init__(self, data, symbols, event_queue, start_date, end_date):
@@ -92,14 +94,14 @@ class DataHandler(AbstractDataHandler):
             return latest_candles[val]
         return pd.Series(dtype=float)
 
-    def visualize_data(self, val):
+    def visualize_data(self, val, y_label):
         fig, ax = plt.subplots(figsize=(14, 7))
         for symbol in self.symbols:
             if not self.data.empty and (val, symbol) in self.data.columns:
                 ax.plot(self.data.index, self.data[(val, symbol)], label=symbol)
-        ax.set_title('Closing Prices vs Date')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Close Price (USD)')
+        ax.set_title(f"{y_label} vs Date")
+        ax.set_xlabel("Date")
+        ax.set_ylabel(y_label)
         ax.legend()
         ax.grid(True)
         fig.tight_layout()

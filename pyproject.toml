@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Alpha9"
-version = "1.0.0"
+version = "0.1.0"
 authors = [
     { name="Divyansh Gupta", email="thedivyanshgupta.100@gmail.com" },
     { name="Sarath Chandra Jandhyala", email="sarathj2006@gmail.com" },
@@ -17,20 +17,18 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent"
 ]
-
 dependencies = [
     "ccxt",
     "ta-lib",
     "pandas",
+    "pyarrow",
+    "fastparquet",
     "numpy",
     "matplotlib",
     "seaborn",
-    "statsmodels",
     "python-dotenv",
     "pyyaml",
-    "torch",
-    "torchvision",
-    "torchaudio"
+    "torch"
 ]
 
 [project.urls]
@@ -38,3 +36,16 @@ dependencies = [
 
 [project.scripts]
 Alpha9 = "Alpha9.main:start"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov", "ruff", "pre-commit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff.lint]
+extend-select = ["I"]

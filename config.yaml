@@ -1,5 +1,6 @@
 # constants related to paths of various parts of project
 path:
+  log: './logs'
   data:
     raw: 'data/raw/'
     featured: 'data/featured/'
