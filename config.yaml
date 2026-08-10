@@ -1,0 +1,88 @@
+# constants related to paths of various parts of project
+path:
+  log: './logs'
+  data:
+    raw: 'data/raw/'
+    featured: 'data/featured/'
+    train: 'data/training'
+    test: 'data/testing'
+
+  strategy:
+    model: 'files/model/'
+    portfolio: 'files/portfolio'
+
+market:
+  transaction_cost_fraction: 0.001
+
+# constants related to pipeline package handling data
+pipeline:
+
+  # constants related to downloading the data
+  exchange: 'binance'
+  symbols:
+    - 'BNB/USDT'
+    - 'BTC/USDT'
+    - 'ETH/USDT'
+    - 'SOL/USDT'
+
+  timeframe: '1h'
+
+  start_date: '2020-06-01'
+  end_date: '2025-12-31'
+
+  # constants related to feature engineering
+  timeperiod_cat: 3
+  timeperiod_cat0: 9
+  timeperiod_cat1: 12
+  timeperiod_cat2: 14
+  timeperiod_cat3: 26
+  timeperiod_cat4: 50
+  selected_features:
+    - 'open'
+    - 'high'
+    - 'low'
+    - 'close'
+    - 'volume'
+    - 'macd-signal-pct'
+    - 'macd-slope'
+    - 'sar'
+    - 'tema'
+    - 'ppo'
+    - 'lin-reg-slope'
+    - 'ichi-cloud-trend'
+    - 'rsi'
+    - 'stoch-osc-slowk'
+    - 'adx'
+    - 'stoch-rsi'
+    - 'bop'
+    - 'natr'
+    - 'obv'
+    - 'vwap'
+    - 'mfi'
+    - 'log-return'
+    - 'vol-spike'
+    - 'norm-volatility'
+
+  # constants related to merge & split
+  train_start_date: '2021-01-01'
+  test_start_date: '2025-07-01'
+
+# constants related to backtest package handling backtesting
+backtest:
+  capital: 1000000
+
+# constants related to strategy package handling strategy
+strategy:
+
+  # constants related to position subpackage handling position sizing
+  bankruptcy_fraction: 0.05
+
+  # constants related to risk subpackage handling risk management
+  slippage_cost_fraction: 0.001
+  stop_loss_multiple: 2
+  stop_loss_portion: 0.8
+  take_profit_multiple: 3
+  take_profit_portion: 0.8
+
+  # other constants related to strategy package
+  sequence_length: 72

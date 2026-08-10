@@ -1,0 +1,11 @@
+# basic libraries
+pandas
+numpy
+matplotlib
+seaborn
+python-dotenv
+pyyaml
+
+# data downloading and indicator calculation
+ccxt
+ta-lib

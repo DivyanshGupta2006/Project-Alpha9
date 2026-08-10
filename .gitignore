@@ -1,0 +1,15 @@
+.venv/
+.idea/
+__pycache__/
+src/Alpha9.egg-info/
+
+data/
+models/
+reports/
+assets/
+files/
+/logs/
+
+.env
+/portfolio.csv
+/state.json
