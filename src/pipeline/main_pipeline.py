@@ -8,10 +8,12 @@ def run():
     raw_data_dir = get_path.absolute(config['path']['data']['raw'])
     featured_data_dir = get_path.absolute(config['path']['data']['featured'])
     train_data_dir = get_path.absolute(config['path']['data']['train'])
+    val_data_dir = get_path.absolute(config['path']['data']['val'])
     test_data_dir = get_path.absolute(config['path']['data']['test'])
     get_path.check(raw_data_dir)
     get_path.check(featured_data_dir)
     get_path.check(train_data_dir)
+    get_path.check(val_data_dir)
     get_path.check(test_data_dir)
 
     # load and handle data downloading constants
@@ -32,6 +34,7 @@ def run():
 
     # load and handle merge and split constants
     train_start_date = config['pipeline']['train_start_date']
+    val_start_date = config['pipeline']['val_start_date']
     test_start_date = config['pipeline']['test_start_date']
 
     # handle data downloading
@@ -68,7 +71,7 @@ def run():
     for symbol in symbols:
         df = read_file.read_data('featured', symbol)
         data[symbol] = df
-    status = merge_split_data.merge_split(data, symbols, train_start_date, test_start_date, train_data_dir, test_data_dir)
+    status = merge_split_data.merge_split(data, symbols, train_start_date, val_start_date, test_start_date, train_data_dir, val_data_dir, test_data_dir)
     if status == 'Success':
         print('Successfully performed merge & split!')
     else:

@@ -5,6 +5,7 @@ path:
     raw: 'data/raw/'
     featured: 'data/featured/'
     train: 'data/training'
+    val: 'data/validation'
     test: 'data/testing'
 
   strategy:
@@ -65,6 +66,7 @@ pipeline:
 
   # constants related to merge & split
   train_start_date: '2021-01-01'
+  val_start_date: '2025-01-01'
   test_start_date: '2025-07-01'
 
 # constants related to backtest package handling backtesting
