@@ -11,7 +11,7 @@ sns.set_theme(style="darkgrid")
 
 
 class DataHandler(AbstractDataHandler):
-    def __init__(self, data, symbols, event_queue, start_date, end_date):
+    def __init__(self, data, symbols, start_date, end_date):
         self.data = data.truncate(before=start_date, after=end_date)
         cols = []
         for col in self.data.columns:
@@ -20,7 +20,6 @@ class DataHandler(AbstractDataHandler):
             cols.append(col)
         self.data.columns = cols
         self.symbols = symbols
-        self.event_queue = event_queue
         self.start_date = start_date
         self.end_date = end_date
         self.continue_backtest = True
@@ -59,7 +58,10 @@ class DataHandler(AbstractDataHandler):
         if candle is not None:
             self.latest_data = candle
             market_event = MarketEvent(timestamp=current_date)
-            self.event_queue.put_event(market_event)
+            return market_event
+        else:
+            self.continue_backtest = False
+            return None
 
     def get_latest_candle(self):
         return self.latest_data
@@ -72,7 +74,6 @@ class DataHandler(AbstractDataHandler):
                 start_loc = max(0, loc - N + 1)
                 return self.data.iloc[start_loc : loc + 1]
             except KeyError:
-                print(f"Error: Latest datetime {latest_date} not found.")
                 return pd.DataFrame()
         return pd.DataFrame()
 
@@ -80,7 +81,6 @@ class DataHandler(AbstractDataHandler):
         latest_candle = self.get_latest_candle()
         if latest_candle is not None:
             return latest_candle.name
-        return None
 
     def get_latest_candle_value(self, val):
         latest_candle = self.get_latest_candle()

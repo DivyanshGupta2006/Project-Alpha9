@@ -30,6 +30,28 @@ class AbstractStrategy(abc.ABC):
     def calculate_fiducia(self, event):
         raise NotImplementedError("Should implement calculate_fiducia()")
 
+class AbstractPortfolio(abc.ABC):
+    @abc.abstractmethod
+    def update_timeindex(self, event):
+        raise NotImplementedError("Should implement update_timeindex()")
+
+    @abc.abstractmethod
+    def update_fill(self, event):
+        raise NotImplementedError("Should implement update_fill()")
+
+    @abc.abstractmethod
+    def update_signal(self, event):
+        raise NotImplementedError("Should implement update_signal()")
+
+class AbstractRiskManager(abc.ABC):
+    @abc.abstractmethod
+    def get_brackets(self, event):
+        raise NotImplementedError("Should implement get_brackets()")
+
+    @abc.abstractmethod
+    def check_brackets(self, event):
+        raise NotImplementedError("Should implement check_brackets()")
+
 class AbstractExchange(abc.ABC):
     @abc.abstractmethod
     def execute_order(self, event):
