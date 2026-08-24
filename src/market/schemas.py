@@ -36,12 +36,12 @@ class AbstractPortfolio(abc.ABC):
         raise NotImplementedError("Should implement update_timeindex()")
 
     @abc.abstractmethod
-    def update_fill(self, event):
-        raise NotImplementedError("Should implement update_fill()")
-
-    @abc.abstractmethod
     def update_signal(self, event):
         raise NotImplementedError("Should implement update_signal()")
+
+    @abc.abstractmethod
+    def update_fill(self, event):
+        raise NotImplementedError("Should implement update_fill()")
 
 class AbstractRiskManager(abc.ABC):
     @abc.abstractmethod
@@ -49,7 +49,7 @@ class AbstractRiskManager(abc.ABC):
         raise NotImplementedError("Should implement get_brackets()")
 
     @abc.abstractmethod
-    def check_brackets(self, event):
+    def check_brackets(self, portfolio):
         raise NotImplementedError("Should implement check_brackets()")
 
 class AbstractExchange(abc.ABC):

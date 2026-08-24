@@ -13,6 +13,9 @@ class Strategy(AbstractStrategy):
         self.seq_length = seq_length
         self.device = device
 
+    def _normalize(self, x):
+        return x
+
     def calculate_fiducia(self, event):
         current_timestamp = event.timestamp
         candles = self.data_handler.get_latest_candles(self.seq_length)
@@ -28,15 +31,18 @@ class Strategy(AbstractStrategy):
 
         state_tensor = torch.tensor(candles.values).to(self.device)
 
-        model_input = state_tensor.reshape(
+        model_input = self._normalize(state_tensor.reshape(
             (1, self.seq_length, state_tensor.shape[1])
-        )
+        ))
 
         fiducia = self.model.forward(model_input)
-        fiducia = fiducia.reshape(-1)
+        fiducia = self._sanitize(fiducia.reshape(-1))
 
         fiducia_dict = dict(zip(self.symbols, fiducia.tolist()))
 
         # Broadcast the signal event
         signal = SignalEvent(current_timestamp, fiducia_dict)
         return signal
+
+    def _sanitize(self, fiducia):
+        return fiducia
