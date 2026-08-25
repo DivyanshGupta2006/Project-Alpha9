@@ -9,3 +9,4 @@ pyyaml
 # data downloading and indicator calculation
 ccxt
 ta-lib
+torch

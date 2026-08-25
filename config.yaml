@@ -5,6 +5,7 @@ path:
     raw: 'data/raw/'
     featured: 'data/featured/'
     train: 'data/training'
+    val: 'data/validation'
     test: 'data/testing'
 
   strategy:
@@ -65,11 +66,14 @@ pipeline:
 
   # constants related to merge & split
   train_start_date: '2021-01-01'
+  val_start_date: '2025-01-01'
   test_start_date: '2025-07-01'
 
 # constants related to backtest package handling backtesting
 backtest:
   capital: 1000000
+  minimum_amount: 0.0000000000001
+  transaction_cost_fraction: 0.001
 
 # constants related to strategy package handling strategy
 strategy:
@@ -80,9 +84,9 @@ strategy:
   # constants related to risk subpackage handling risk management
   slippage_cost_fraction: 0.001
   stop_loss_multiple: 2
-  stop_loss_portion: 0.8
+  stop_loss_fraction: 0.8
   take_profit_multiple: 3
-  take_profit_portion: 0.8
+  take_profit_fraction: 0.8
 
   # other constants related to strategy package
   sequence_length: 72
