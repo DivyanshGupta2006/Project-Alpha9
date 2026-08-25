@@ -1,3 +1,4 @@
+import copy
 import pandas as pd
 
 from market import schemas
@@ -43,17 +44,18 @@ class Portfolio(schemas.AbstractPortfolio):
         self._cash = self._capital
         self._txn_cost = 0.0
         self._equity = self._cash
-        self._portfolio_history = {}
+        self._portfolio_history = []
         self._bankrupt = False
 
     def _record_holdings(self, timestamp):
         snapshot = {
-            'portfolio': self._portfolio,
+            'timestamp': timestamp,
+            'portfolio': copy.deepcopy(self._portfolio),
             'equity': self._equity,
             'cash': self._cash,
             'transaction cost': self._txn_cost,
         }
-        self._portfolio_history[timestamp] = snapshot
+        self._portfolio_history.append(snapshot)
 
     def _update_latest_equity(self):
         sum = 0.0
@@ -126,23 +128,23 @@ class Portfolio(schemas.AbstractPortfolio):
                 self._portfolio[symbol]['take-profit']['portion'] = event.description[symbol]['take-profit']['portion']
 
     def save_equity(self):
-        rows = []
-        for ts, snapshot in self._portfolio_history.items():
-            for symbol, pos in snapshot['portfolio'].items():
-                rows.append({
-                    'timestamp': ts,
-                    'symbol': symbol,
-                    'amt': pos['amt'],
-                    'avg_cost': pos['avg-cost'],
-                    'sl_price': pos['stop-loss']['price'],
-                    'sl_portion': pos['stop-loss']['portion'],
-                    'tp_price': pos['take-profit']['price'],
-                    'tp_portion': pos['take-profit']['portion'],
-                    'cash': snapshot['cash'],
-                    'equity': snapshot['equity'],
-                    'txn_cost': snapshot['transaction cost'],
-                })
+        # rows = []
+        # for snapshot in self._portfolio_history:
+        #     for symbol, pos in snapshot['portfolio'].items():
+        #         rows.append({
+        #             'timestamp': snapshot['timestamp'],
+        #             'symbol': symbol,
+        #             'amt': pos['amt'],
+        #             'avg_cost': pos['avg-cost'],
+        #             'sl_price': pos['stop-loss']['price'],
+        #             'sl_portion': pos['stop-loss']['portion'],
+        #             'tp_price': pos['take-profit']['price'],
+        #             'tp_portion': pos['take-profit']['portion'],
+        #             'cash': snapshot['cash'],
+        #             'equity': snapshot['equity'],
+        #             'txn_cost': snapshot['transaction cost'],
+        #         })
 
-        pd.DataFrame(rows).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
+        pd.DataFrame(self._portfolio_history).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
     def visualize_equity(self):
         pass

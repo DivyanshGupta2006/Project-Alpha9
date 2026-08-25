@@ -45,4 +45,7 @@ class Strategy(AbstractStrategy):
         return signal
 
     def _sanitize(self, fiducia):
-        return fiducia
+        _sum = 0
+        for val in fiducia:
+            _sum += abs(val)
+        return fiducia / _sum

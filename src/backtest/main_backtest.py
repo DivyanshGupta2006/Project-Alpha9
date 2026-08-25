@@ -57,28 +57,38 @@ def run(data_type, start_date, end_date):
 
             while not event_queue.empty():
                 event = event_queue.get_event()
+                print(event)
 
                 if event.type == 'MARKET':
+                    print(event.timestamp)
                     portfolio.update_time_index(event)
+                    print(portfolio._portfolio)
+                    print(portfolio._portfolio_history)
                     signal_event = strategy.calculate_fiducia(event)
                     if signal_event:
                         event_queue.put_event(signal_event)
 
                 elif event.type == 'SIGNAL':
+                    print(event.fiducia)
                     order_event = portfolio.update_signal(event)
                     if order_event:
                         event_queue.put_event(order_event)
 
                 elif event.type == 'ORDER':
+                    print(event.description)
                     fill_event = exchange.execute_order(event)
                     if fill_event:
                         event_queue.put_event(fill_event)
 
                 elif event.type == 'FILL':
+                    print(event.description)
+                    print(event.cash_delta)
+                    print(event.txn_cost)
                     portfolio.update_fill(event)
 
 
     portfolio.save_equity()
+    print(market_updates)
 
 
-run('train', '2021-01-01 00:00:00', '2021-01-01 01:00:00')
+run('train', '2021-01-01 00:00:00', '2021-01-01 09:00:00')
