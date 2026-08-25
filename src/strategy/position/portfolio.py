@@ -1,3 +1,5 @@
+import pandas as pd
+
 from market import schemas
 from market.events import OrderEvent
 
@@ -10,7 +12,8 @@ class Portfolio(schemas.AbstractPortfolio):
                  slippage_fraction,
                  transaction_cost_fraction,
                  minimum_amount,
-                 bankruptcy_fraction):
+                 bankruptcy_fraction,
+                 portfolio_dir):
         super().__init__()
         self.symbols = symbols
         self.data_handler = data_handler
@@ -20,6 +23,7 @@ class Portfolio(schemas.AbstractPortfolio):
         self._transaction_cost_fraction = transaction_cost_fraction
         self._min_amt = float(minimum_amount)
         self._bankruptcy_threshold = bankruptcy_fraction * initial_capital
+        self.portfolio_dir = portfolio_dir
 
         self._portfolio = {}
         for symbol in self.symbols:
@@ -122,6 +126,23 @@ class Portfolio(schemas.AbstractPortfolio):
                 self._portfolio[symbol]['take-profit']['portion'] = event.description[symbol]['take-profit']['portion']
 
     def save_equity(self):
-        pass
+        rows = []
+        for ts, snapshot in self._portfolio_history.items():
+            for symbol, pos in snapshot['portfolio'].items():
+                rows.append({
+                    'timestamp': ts,
+                    'symbol': symbol,
+                    'amt': pos['amt'],
+                    'avg_cost': pos['avg-cost'],
+                    'sl_price': pos['stop-loss']['price'],
+                    'sl_portion': pos['stop-loss']['portion'],
+                    'tp_price': pos['take-profit']['price'],
+                    'tp_portion': pos['take-profit']['portion'],
+                    'cash': snapshot['cash'],
+                    'equity': snapshot['equity'],
+                    'txn_cost': snapshot['transaction cost'],
+                })
+
+        pd.DataFrame(rows).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
     def visualize_equity(self):
         pass
