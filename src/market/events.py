@@ -21,12 +21,12 @@ class OrderEvent(Event):
         self.description = description
 
 class FillEvent(Event):
-    def __init__(self, timestamp, description, cash_change, transaction_cost):
+    def __init__(self, timestamp, description, cash_delta, transaction_cost):
         self.type = "FILL"
         self.timestamp = timestamp
         self.description = description
-        self.cash_change = cash_change
-        self.transaction_cost = transaction_cost
+        self.cash_delta = cash_delta
+        self.txn_cost = transaction_cost
 
 class EventQueue:
     def __init__(self):

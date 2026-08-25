@@ -1,14 +1,23 @@
-import pandas as pd
 from market import schemas
+from market.events import OrderEvent
 
 class Portfolio(schemas.AbstractPortfolio):
-    def __init__(self, symbols, data_handler, risk_manager, initial_capital, slippage_fraction, minimum_amount, bankruptcy_fraction):
+    def __init__(self,
+                 symbols,
+                 data_handler,
+                 risk_manager,
+                 initial_capital,
+                 slippage_fraction,
+                 transaction_cost_fraction,
+                 minimum_amount,
+                 bankruptcy_fraction):
         super().__init__()
         self.symbols = symbols
         self.data_handler = data_handler
         self.risk_manager = risk_manager
         self._capital = float(initial_capital)
         self._slippage_fraction = slippage_fraction
+        self._transaction_cost_fraction = transaction_cost_fraction
         self._min_amt = float(minimum_amount)
         self._bankruptcy_threshold = bankruptcy_fraction * initial_capital
 
@@ -16,7 +25,7 @@ class Portfolio(schemas.AbstractPortfolio):
         for symbol in self.symbols:
             self._portfolio[symbol] = {
                 'amt': 0.0,
-                'avg-order-price': 0.0,
+                'avg-cost': 0.0,
                 'stop-loss': {
                     'price': 0.0,
                     'portion': 0.0
@@ -43,8 +52,6 @@ class Portfolio(schemas.AbstractPortfolio):
         self._portfolio_history[timestamp] = snapshot
 
     def _update_latest_equity(self):
-        self.risk_manager.check_brackets(self._portfolio)
-
         sum = 0.0
         for symbol in self.symbols:
             amnt = self._portfolio[symbol]['amt']
@@ -54,12 +61,14 @@ class Portfolio(schemas.AbstractPortfolio):
                 value = latest_price * amnt
                 sum += value
 
-        if sum <= self._bankruptcy_threshold:
+        if sum + self._cash <= self._bankruptcy_threshold:
             self._bankrupt = True
 
         self._equity = sum + self._cash
 
     def update_time_index(self, event):
+        cash_delta = self.risk_manager.check_brackets(self._portfolio)
+        self._cash += cash_delta
         self._update_latest_equity()
         if self._bankrupt:
             self.data_handler.continue_backtest = False
@@ -81,6 +90,8 @@ class Portfolio(schemas.AbstractPortfolio):
             else:
                 order_amt = 0
 
+            order_amt /= ((1 + self._transaction_cost_fraction) * (1 + self._slippage_fraction))
+
             res[symbol] = {
                 'order-amt': order_amt,
                 'order-price': order_price,
@@ -91,10 +102,25 @@ class Portfolio(schemas.AbstractPortfolio):
     def update_signal(self, event):
         fiducia = event.fiducia
         order_amount_and_order_price = self._get_order_amount_and_order_price(fiducia)
-        brackets = self.risk_manager.get_brackets()
+        self.risk_manager.get_brackets(order_amount_and_order_price, self._portfolio)
+        return OrderEvent(event.timestamp, order_amount_and_order_price)
 
     def update_fill(self, event):
-        pass
+        self._cash += event.cash_delta
+        self._txn_cost += event.txn_cost
+        for symbol in self.symbols:
+            if symbol in event.description:
+
+                self._portfolio[symbol]['avg-cost'] = (
+                        (self._portfolio[symbol]['avg-cost'] * self._portfolio[symbol]['amt']
+                         + event.description[symbol]['order-price'] * event.description[symbol]['order-amt'])
+                        / (self._portfolio[symbol]['amt'] + event.description[symbol]['order-amt']))
+                self._portfolio[symbol]['amt'] += event.description[symbol]['order-amt']
+                self._portfolio[symbol]['stop-loss']['price'] = event.description[symbol]['stop-loss']['price']
+                self._portfolio[symbol]['take-profit']['price'] = event.description[symbol]['take-profit']['price']
+                self._portfolio[symbol]['stop-loss']['portion'] = event.description[symbol]['stop-loss']['portion']
+                self._portfolio[symbol]['take-profit']['portion'] = event.description[symbol]['take-profit']['portion']
+
     def save_equity(self):
         pass
     def visualize_equity(self):

@@ -32,7 +32,7 @@ class AbstractStrategy(abc.ABC):
 
 class AbstractPortfolio(abc.ABC):
     @abc.abstractmethod
-    def update_timeindex(self, event):
+    def update_time_index(self, event):
         raise NotImplementedError("Should implement update_timeindex()")
 
     @abc.abstractmethod
@@ -45,7 +45,7 @@ class AbstractPortfolio(abc.ABC):
 
 class AbstractRiskManager(abc.ABC):
     @abc.abstractmethod
-    def get_brackets(self, event):
+    def get_brackets(self, order_amount_and_order_price, portfolio):
         raise NotImplementedError("Should implement get_brackets()")
 
     @abc.abstractmethod
