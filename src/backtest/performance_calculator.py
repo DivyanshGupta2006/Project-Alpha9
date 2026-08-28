@@ -1,5 +1,6 @@
-# Max Drawdown, total cumulative profit, current_profit
 import numpy as np
+
+
 def calculate_performance(portfolio_history, period_per_year = 365*24):
     if not portfolio_history or len(portfolio_history) < 3:
         return {}

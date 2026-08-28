@@ -111,16 +111,31 @@ class Portfolio(schemas.AbstractPortfolio):
         self.risk_manager.get_brackets(order_amount_and_order_price, self._portfolio)
         return OrderEvent(event.timestamp, order_amount_and_order_price)
 
+    def _get_avg_cost_price(self, prev_avg_cost, prev_amt, order_price, order_amt):
+        new_amt = prev_amt + order_amt
+        new_avg_cost = prev_avg_cost
+        same_dir_add = (
+            prev_amt == 0 or (prev_amt > 0) == (order_amt > 0)
+        )
+        if abs(new_amt) < self._min_amt:
+            return 0.0
+        if same_dir_add:
+            new_avg_cost = (prev_avg_cost * prev_amt + order_price * order_amt) / new_amt
+        elif prev_amt != 0 and (prev_amt > 0) != (new_amt > 0):
+            new_avg_cost = order_price
+        return new_avg_cost
+
     def update_fill(self, event):
         self._cash += event.cash_delta
         self._txn_cost += event.txn_cost
         for symbol in self.symbols:
             if symbol in event.description:
-
-                self._portfolio[symbol]['avg-cost'] = (
-                        (self._portfolio[symbol]['avg-cost'] * self._portfolio[symbol]['amt']
-                         + event.description[symbol]['order-price'] * event.description[symbol]['order-amt'])
-                        / (self._portfolio[symbol]['amt'] + event.description[symbol]['order-amt']))
+                self._portfolio[symbol]['avg-cost'] = self._get_avg_cost_price(
+                    self._portfolio[symbol]['avg-cost'],
+                    self._portfolio[symbol]['amt'],
+                    event.description[symbol]['order-price'],
+                    event.description[symbol]['order-amt']
+                )
                 self._portfolio[symbol]['amt'] += event.description[symbol]['order-amt']
                 self._portfolio[symbol]['stop-loss']['price'] = event.description[symbol]['stop-loss']['price']
                 self._portfolio[symbol]['take-profit']['price'] = event.description[symbol]['take-profit']['price']
@@ -128,23 +143,23 @@ class Portfolio(schemas.AbstractPortfolio):
                 self._portfolio[symbol]['take-profit']['portion'] = event.description[symbol]['take-profit']['portion']
 
     def save_equity(self):
-        # rows = []
-        # for snapshot in self._portfolio_history:
-        #     for symbol, pos in snapshot['portfolio'].items():
-        #         rows.append({
-        #             'timestamp': snapshot['timestamp'],
-        #             'symbol': symbol,
-        #             'amt': pos['amt'],
-        #             'avg_cost': pos['avg-cost'],
-        #             'sl_price': pos['stop-loss']['price'],
-        #             'sl_portion': pos['stop-loss']['portion'],
-        #             'tp_price': pos['take-profit']['price'],
-        #             'tp_portion': pos['take-profit']['portion'],
-        #             'cash': snapshot['cash'],
-        #             'equity': snapshot['equity'],
-        #             'txn_cost': snapshot['transaction cost'],
-        #         })
+        rows = []
+        for snapshot in self._portfolio_history:
+            for symbol, pos in snapshot['portfolio'].items():
+                rows.append({
+                    'timestamp': snapshot['timestamp'],
+                    'symbol': symbol,
+                    'amt': f"{pos['amt']:.2f}",
+                    'avg_cost': f"{pos['avg-cost']:.2f}",
+                    'sl_price': f"{pos['stop-loss']['price']:.2f}",
+                    'sl_portion': f"{pos['stop-loss']['portion']:.2f}",
+                    'tp_price': f"{pos['take-profit']['price']:.2f}",
+                    'tp_portion': f"{pos['take-profit']['portion']:.2f}",
+                    'cash': f"{snapshot['cash']:.2f}",
+                    'equity': f"{snapshot['equity']:.2f}",
+                    'txn_cost': f"{snapshot['transaction cost']:.2f}",
+                })
 
-        pd.DataFrame(self._portfolio_history).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
+        pd.DataFrame(rows).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
     def visualize_equity(self):
         pass

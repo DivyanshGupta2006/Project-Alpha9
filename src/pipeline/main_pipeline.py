@@ -3,7 +3,7 @@ from utility import get_config, get_path, read_file
 
 config = get_config.load()
 
-def run():
+def run(choice):
     # load and handle paths
     raw_data_dir = get_path.absolute(config['path']['data']['raw'])
     featured_data_dir = get_path.absolute(config['path']['data']['featured'])
@@ -38,7 +38,6 @@ def run():
     test_start_date = config['pipeline']['test_start_date']
 
     # handle data downloading
-    choice = input('Download the data [y/n] : ')
     if choice.lower() == 'y':
         from pipeline import download_data
         print("Please wait...\nThis may take a while...")

@@ -17,7 +17,7 @@ class RiskManager(AbstractRiskManager):
         for symbol in self.symbols:
             amt = order_amount_and_order_price[symbol]['order-amt'] + portfolio[symbol]['amt']
             order_price = order_amount_and_order_price[symbol]['order-price']
-            _natr = self.data_handler.get_latest_candle_value(('natr', symbol))
+            _natr = self.data_handler.get_latest_candle_value(('natr', symbol)) / 100
             sl_target = sl_amount = tp_target = tp_amount = 0
 
             if order_amount_and_order_price[symbol]['order-amt'] > self._min_amt:

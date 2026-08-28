@@ -8,8 +8,7 @@ class Strategy(AbstractStrategy):
     def __init__(self, data_handler, model, symbols, seq_length, device):
         self.data_handler = data_handler
         self.model = model
-        self.symbols = symbols.copy()
-        self.symbols.append("EXPOSURE")
+        self.symbols = symbols
         self.seq_length = seq_length
         self.device = device
 

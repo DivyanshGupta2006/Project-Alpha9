@@ -28,7 +28,6 @@ def run(data_type, start_date, end_date):
     get_path.check(model_dir)
     get_path.check(portfolio_dir)
     seq_len = config['strategy']['sequence_length']
-    seq_len = 2
     min_amt = config['backtest']['minimum_amount']
     txn_cost = config['backtest']['transaction_cost_fraction']
     capital = config['backtest']['capital']
@@ -57,38 +56,26 @@ def run(data_type, start_date, end_date):
 
             while not event_queue.empty():
                 event = event_queue.get_event()
-                print(event)
 
                 if event.type == 'MARKET':
-                    print(event.timestamp)
                     portfolio.update_time_index(event)
-                    print(portfolio._portfolio)
-                    print(portfolio._portfolio_history)
                     signal_event = strategy.calculate_fiducia(event)
                     if signal_event:
                         event_queue.put_event(signal_event)
 
                 elif event.type == 'SIGNAL':
-                    print(event.fiducia)
                     order_event = portfolio.update_signal(event)
                     if order_event:
                         event_queue.put_event(order_event)
 
                 elif event.type == 'ORDER':
-                    print(event.description)
                     fill_event = exchange.execute_order(event)
                     if fill_event:
                         event_queue.put_event(fill_event)
 
                 elif event.type == 'FILL':
-                    print(event.description)
-                    print(event.cash_delta)
-                    print(event.txn_cost)
+                    # print(event.description)
                     portfolio.update_fill(event)
 
 
     portfolio.save_equity()
-    print(market_updates)
-
-
-run('train', '2021-01-01 00:00:00', '2021-01-01 09:00:00')

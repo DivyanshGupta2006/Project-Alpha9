@@ -73,7 +73,7 @@ pipeline:
 backtest:
   capital: 1000000
   minimum_amount: 0.0000000000001
-  transaction_cost_fraction: 0.001
+  transaction_cost_fraction: 0.002
 
 # constants related to strategy package handling strategy
 strategy:
@@ -89,4 +89,4 @@ strategy:
   take_profit_fraction: 0.8
 
   # other constants related to strategy package
-  sequence_length: 72
+  sequence_length: 2

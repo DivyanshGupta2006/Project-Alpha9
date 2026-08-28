@@ -1,3 +1,5 @@
+import copy
+
 from market.schemas import AbstractExchange
 from market.events import FillEvent
 
@@ -19,7 +21,9 @@ class Exchange(AbstractExchange):
 
             order_val = amt * price
             transaction_cost += self._transaction_cost_fraction * abs(order_val)
-            cash_delta -= (order_val + transaction_cost)
-            fills[symbol] = desc[symbol]
+            cash_delta -= (order_val)
+            fills[symbol] = copy.deepcopy(desc[symbol])
+
+        cash_delta -= transaction_cost
 
         return FillEvent(event.timestamp, fills, cash_delta, transaction_cost)
