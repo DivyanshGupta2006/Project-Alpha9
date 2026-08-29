@@ -20,12 +20,12 @@ class RiskManager(AbstractRiskManager):
             _natr = self.data_handler.get_latest_candle_value(('natr', symbol)) / 100
             sl_target = sl_amount = tp_target = tp_amount = 0
 
-            if order_amount_and_order_price[symbol]['order-amt'] > self._min_amt:
+            if amt > self._min_amt:
                 sl_target = order_price * (1 - self.stop_loss_multiple * _natr)
                 sl_amount = amt * self.stop_loss_fraction
                 tp_target = order_price * (1 + self.take_profit_multiple * _natr)
                 tp_amount = amt * self.take_profit_fraction
-            elif order_amount_and_order_price[symbol]['order-amt'] < -self._min_amt:
+            elif amt < -self._min_amt:
                 sl_target = order_price * (1 + self.stop_loss_multiple * _natr)
                 sl_amount = amt * self.stop_loss_fraction
                 tp_target = order_price * (1 - self.take_profit_multiple * _natr)
