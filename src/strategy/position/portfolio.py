@@ -1,5 +1,6 @@
 import copy
 import pandas as pd
+import plotly.express as px
 
 from market import schemas
 from market.events import OrderEvent
@@ -129,7 +130,7 @@ class Portfolio(schemas.AbstractPortfolio):
         self._cash += event.cash_delta
         self._txn_cost += event.txn_cost
         for symbol in self.symbols:
-            if symbol in event.description:
+            if symbol in event.description and abs(event.description[symbol]['order-amt']) > self._min_amt:
                 self._portfolio[symbol]['avg-cost'] = self._get_avg_cost_price(
                     self._portfolio[symbol]['avg-cost'],
                     self._portfolio[symbol]['amt'],
@@ -161,5 +162,6 @@ class Portfolio(schemas.AbstractPortfolio):
                 })
 
         pd.DataFrame(rows).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
+        # pd.DataFrame(self._portfolio_history).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
     def visualize_equity(self):
-        pass
+        px.line(self._portfolio_history, x='timestamp', y='equity', markers=True).write_html(self.portfolio_dir / "equity.html")

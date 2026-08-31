@@ -7,7 +7,7 @@ from strategy.predict import Strategy
 from strategy.risk.risk_manager import RiskManager
 from strategy.position.portfolio import Portfolio
 from market.exchange import Exchange
-from backtest import performance_calculator as pf_calc
+from backtest import performance_calculator as pf_calc, performance_calculator
 
 from utility import get_config, get_path, read_file
 
@@ -47,6 +47,7 @@ def run(data_type, start_date, end_date):
     risk_m = RiskManager(data_handler, SYMBOLS, min_amt, slm, slp, tpm, tpp)
     portfolio = Portfolio(SYMBOLS, data_handler, risk_m, capital, slippage, txn_cost, min_amt, bankruptcy_fraction, portfolio_dir)
     exchange = Exchange(SYMBOLS, txn_cost, min_amt)
+    performance_calculator = pf_calc.PerformanceCalculator(capital)
 
     while data_handler.continue_backtest:
         event = data_handler.update_candles()
@@ -74,8 +75,10 @@ def run(data_type, start_date, end_date):
                         event_queue.put_event(fill_event)
 
                 elif event.type == 'FILL':
-                    # print(event.description)
                     portfolio.update_fill(event)
 
 
     portfolio.save_equity()
+    portfolio.visualize_equity()
+    metrics = performance_calculator.get_metrics(portfolio._portfolio_history)
+    print(metrics)

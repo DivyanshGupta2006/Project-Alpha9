@@ -56,3 +56,8 @@ class AbstractExchange(abc.ABC):
     @abc.abstractmethod
     def execute_order(self, event):
         raise NotImplementedError("Should implement execute_order()")
+
+class AbstractPerformanceCalculator(abc.ABC):
+    @abc.abstractmethod
+    def get_metrics(self, portfolio_history):
+        raise NotImplementedError("Should implement get_metrics()")

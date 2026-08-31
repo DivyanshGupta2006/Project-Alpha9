@@ -51,19 +51,23 @@ class RiskManager(AbstractRiskManager):
                     cash_delta += portfolio[symbol]['stop-loss']['price'] * portfolio[symbol]['stop-loss']['portion']
                     portfolio[symbol]['amt'] -= portfolio[symbol]['stop-loss']['portion']
                     portfolio[symbol]['stop-loss']['portion'] = 0
+                    portfolio[symbol]['take-profit']['portion'] = 0
                 elif high >= portfolio[symbol]['take-profit']['price']:
                     cash_delta += portfolio[symbol]['take-profit']['price'] * portfolio[symbol]['take-profit']['portion']
                     portfolio[symbol]['amt'] -= portfolio[symbol]['take-profit']['portion']
                     portfolio[symbol]['take-profit']['portion'] = 0
+                    portfolio[symbol]['stop-loss']['portion'] = 0
             elif portfolio[symbol]['amt'] < -self._min_amt:
                 if high >= portfolio[symbol]['stop-loss']['price']:
                     cash_delta += portfolio[symbol]['stop-loss']['price'] * portfolio[symbol]['stop-loss']['portion']
                     portfolio[symbol]['amt'] -= portfolio[symbol]['stop-loss']['portion']
                     portfolio[symbol]['stop-loss']['portion'] = 0
+                    portfolio[symbol]['take-profit']['portion'] = 0
                 elif low <= portfolio[symbol]['take-profit']['price']:
                     cash_delta += portfolio[symbol]['take-profit']['price'] * portfolio[symbol]['take-profit'][
                         'portion']
                     portfolio[symbol]['amt'] -= portfolio[symbol]['take-profit']['portion']
                     portfolio[symbol]['take-profit']['portion'] = 0
+                    portfolio[symbol]['stop-loss']['portion'] = 0
 
         return cash_delta
