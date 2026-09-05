@@ -3,6 +3,7 @@ import ast
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import plotly.express as px
 
 from market.events import MarketEvent
 from market.schemas import AbstractDataHandler
@@ -11,7 +12,7 @@ sns.set_theme(style="darkgrid")
 
 
 class DataHandler(AbstractDataHandler):
-    def __init__(self, data, symbols, start_date, end_date):
+    def __init__(self, data, symbols, start_date, end_date, portfolio_dir):
         self.data = data.truncate(before=start_date, after=end_date)
         cols = []
         for col in self.data.columns:
@@ -22,6 +23,7 @@ class DataHandler(AbstractDataHandler):
         self.symbols = symbols
         self.start_date = start_date
         self.end_date = end_date
+        self.portfolio_dir = portfolio_dir
         self.continue_backtest = True
         self.latest_data = {}
         self._data_index = None
@@ -94,16 +96,6 @@ class DataHandler(AbstractDataHandler):
             return latest_candles[val]
         return pd.Series(dtype=float)
 
-    def visualize_data(self, val, y_label):
-        fig, ax = plt.subplots(figsize=(14, 7))
-        for symbol in self.symbols:
-            if not self.data.empty and (val, symbol) in self.data.columns:
-                ax.plot(self.data.index, self.data[(val, symbol)], label=symbol)
-        ax.set_title(f"{y_label} vs Date")
-        ax.set_xlabel("Date")
-        ax.set_ylabel(y_label)
-        ax.legend()
-        ax.grid(True)
-        fig.tight_layout()
-        plt.show()
-        plt.close(fig)
+    def plot_value(self, val):
+        y = self.data[val]
+        px.line(self.data, x=self.data.index, y=y, markers=True).write_html(self.portfolio_dir / f"{val}-plot.html")

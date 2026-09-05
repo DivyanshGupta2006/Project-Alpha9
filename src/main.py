@@ -13,6 +13,6 @@ def start():
         # _start = input('Enter the start date : ')
         _start = '2021-01-01'
         # end = input('Enter the end date : ')
-        end = '2021-12-31 23:59:59'
+        end = '2023-12-31 23:59:59'
         main_backtest.run(data_type, _start, end)
     print("Thank you for using Alpha9!")

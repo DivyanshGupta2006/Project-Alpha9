@@ -41,7 +41,7 @@ def run(data_type, start_date, end_date):
 
     market_updates = 0
     event_queue = EventQueue()
-    data_handler = DataHandler(data, SYMBOLS, start_date, end_date)
+    data_handler = DataHandler(data, SYMBOLS, start_date, end_date, portfolio_dir)
     model = Model(SYMBOLS, model_dir)
     strategy = Strategy(data_handler, model, SYMBOLS, seq_len, device)
     risk_m = RiskManager(data_handler, SYMBOLS, min_amt, slm, slp, tpm, tpp)
@@ -81,4 +81,6 @@ def run(data_type, start_date, end_date):
     portfolio.save_equity()
     portfolio.visualize_equity()
     metrics = performance_calculator.get_metrics(portfolio._portfolio_history)
+    for symbol in SYMBOLS:
+        data_handler.plot_value(('close', symbol))
     print(metrics)

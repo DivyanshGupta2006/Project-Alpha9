@@ -9,7 +9,7 @@ class Model(nn.Module):
         self.model_dir = model_dir
 
     def forward(self, x):
-        return torch.tensor([4, 77, 1, -2])
+        return torch.tensor([1, 1, 1, 1])
 
     def save(self):
         pass

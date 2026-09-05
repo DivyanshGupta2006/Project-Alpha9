@@ -11,3 +11,7 @@ pyyaml
 ccxt
 ta-lib
 torch
+
+# environment and agent related libraries
+gymnasium
+sb3-contrib
