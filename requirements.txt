@@ -6,6 +6,8 @@ seaborn
 plotly
 python-dotenv
 pyyaml
+pytest
+pytest-cov
 
 # data downloading and indicator calculation
 ccxt
