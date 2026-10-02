@@ -27,6 +27,14 @@ class AbstractDataHandler(abc.ABC):
 
 class AbstractStrategy(abc.ABC):
     @abc.abstractmethod
+    def action(self, raw_state, deterministic=False):
+        raise NotImplementedError("Should implement act()")
+
+    @abc.abstractmethod
+    def evaluate(self, raw_state, actions):
+        raise NotImplementedError("Should implement evaluate()")
+
+    @abc.abstractmethod
     def calculate_fiducia(self, event):
         raise NotImplementedError("Should implement calculate_fiducia()")
 
