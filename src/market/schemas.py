@@ -27,11 +27,11 @@ class AbstractDataHandler(abc.ABC):
 
 class AbstractStrategy(abc.ABC):
     @abc.abstractmethod
-    def action(self, raw_state, deterministic=False):
+    def action(self, event, deterministic=False):
         raise NotImplementedError("Should implement act()")
 
     @abc.abstractmethod
-    def evaluate(self, raw_state, actions):
+    def evaluate(self, event, actions):
         raise NotImplementedError("Should implement evaluate()")
 
     @abc.abstractmethod

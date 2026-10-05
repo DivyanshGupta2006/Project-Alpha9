@@ -7,8 +7,7 @@ from strategy.predict import Strategy
 from strategy.risk.risk_manager import RiskManager
 from strategy.position.portfolio import Portfolio
 from market.exchange import Exchange
-from backtest import performance_calculator as pf_calc, performance_calculator
-
+from backtest import performance_calculator as pf_calc
 from utility import get_config, get_path, read_file
 
 config = get_config.load()

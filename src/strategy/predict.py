@@ -28,28 +28,7 @@ class Strategy(AbstractStrategy):
         total = fiducia.abs().sum()
         return fiducia / total if total > 0 else fiducia
 
-    #TODO: Uniformize theese three interfaces!
-
-    @torch.no_grad()
-    def action(self, raw_state, deterministic=False):
-        self.model.eval()
-        state = self._normalize(raw_state.to(self.device))
-        dist, value = self.model(state)
-        action = dist.mean if deterministic else dist.sample()
-        log_prob = dist.log_prob(action).sum(dim=-1)
-        return action, log_prob, value.squeeze(-1)
-
-    def evaluate(self, raw_state, actions):
-        self.model.train()
-        state = self._normalize(raw_state.to(self.device))
-        dist, value = self.model(state)
-        log_prob = dist.log_prob(actions).sum(dim=-1)
-        entropy = dist.entropy().sum(dim=-1)
-        return log_prob, entropy, value.squeeze(-1)
-
-    @torch.no_grad()
-    def calculate_fiducia(self, event):
-        self.model.eval()
+    def _construct_state(self):
         candles = self.data_handler.get_latest_candles(self.seq_len)
         if len(candles) < self.seq_len:
             return None
@@ -61,10 +40,49 @@ class Strategy(AbstractStrategy):
             candles.values, dtype=torch.float32, device=self.device
         ).reshape(1, self.seq_len, -1)
 
-        state = self._normalize(raw_state)
+        return self._normalize(raw_state.to(self.device))
+
+    @torch.no_grad()
+    def action(self, event, deterministic=False):
+        self.model.eval()
+
+        state = self._construct_state()
+        if not state:
+            return None, None, None, None
+
+        dist, value = self.model(state)
+        action = dist.mean if deterministic else dist.sample()
+        log_prob = dist.log_prob(action).sum(dim=-1)
+
+        fiducia = self._sanitize(action.reshape(-1))
+        fiducia_dict = dict(zip(self.symbols, fiducia.tolist()))
+
+        return action, log_prob, value.squeeze(-1), SignalEvent(event.timestamp, fiducia_dict)
+
+    def evaluate(self, event, actions):
+        self.model.train()
+
+        state = self._construct_state()
+        if not state:
+            return None, None, None, None
+
+        dist, value = self.model(state)
+        log_prob = dist.log_prob(actions).sum(dim=-1)
+        entropy = dist.entropy().sum(dim=-1)
+
+        return log_prob, entropy, value.squeeze(-1)
+
+    @torch.no_grad()
+    def calculate_fiducia(self, event):
+        self.model.eval()
+
+        state = self._construct_state()
+        if not state:
+            return None, None, None, None
+
         dist, _ = self.model(state)
 
         fiducia = self._sanitize(dist.mean.reshape(-1))
         fiducia_dict = dict(zip(self.symbols, fiducia.tolist()))
 
-        return SignalEvent(event.timestamp,     fiducia_dict)
+        return SignalEvent(event.timestamp, fiducia_dict)
