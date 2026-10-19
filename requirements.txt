@@ -6,6 +6,7 @@ seaborn
 plotly
 python-dotenv
 pyyaml
+typing
 
 # data downloading and indicator calculation
 ccxt
