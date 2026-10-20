@@ -1,6 +1,6 @@
 import torch
 
-from market.events import EventQueue
+from market.events import EventQueue, MarketEvent
 from pipeline.data_handler import DataHandler
 from strategy.model import Model
 from strategy.predict import Strategy
@@ -9,6 +9,8 @@ from strategy.position.portfolio import Portfolio
 from market.exchange import Exchange
 from backtest import performance_calculator as pf_calc
 from utility import get_config, get_path, read_file
+
+from strategy.environment import MarketEnv
 
 config = get_config.load()
 
@@ -41,12 +43,14 @@ def run(data_type, start_date, end_date):
     market_updates = 0
     event_queue = EventQueue()
     data_handler = DataHandler(data, SYMBOLS, start_date, end_date, portfolio_dir)
-    model = Model(SYMBOLS, model_dir)
-    strategy = Strategy(data_handler, model, SYMBOLS, seq_len, device)
+    model = Model(10, 5)
+    strategy = Strategy(model, data_handler, SYMBOLS, ['high','low'], seq_len = seq_len, device = device)
     risk_m = RiskManager(data_handler, SYMBOLS, min_amt, slm, slp, tpm, tpp)
     portfolio = Portfolio(SYMBOLS, data_handler, risk_m, capital, slippage, txn_cost, min_amt, bankruptcy_fraction, portfolio_dir)
     exchange = Exchange(SYMBOLS, txn_cost, min_amt)
     performance_calculator = pf_calc.PerformanceCalculator(capital)
+
+    env = MarketEnv(data_handler, portfolio, max_episode_steps=100)
 
     while data_handler.continue_backtest:
         event = data_handler.update_candles()
@@ -54,7 +58,8 @@ def run(data_type, start_date, end_date):
             market_updates += 1
             event_queue.put_event(event)
 
-            while not event_queue.empty():
+            episode_complete = False
+            while not event_queue.empty() and not episode_complete:
                 event = event_queue.get_event()
 
                 if event.type == 'MARKET':
@@ -74,7 +79,10 @@ def run(data_type, start_date, end_date):
                         event_queue.put_event(fill_event)
 
                 elif event.type == 'FILL':
-                    portfolio.update_fill(event)
+                    observation, reward, terminated, truncated, info = env.step(event)
+
+            if episode_complete:
+                break
 
 
     portfolio.save_equity()

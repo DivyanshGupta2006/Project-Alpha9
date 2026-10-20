@@ -163,5 +163,12 @@ class Portfolio(schemas.AbstractPortfolio):
 
         pd.DataFrame(rows).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
         # pd.DataFrame(self._portfolio_history).to_csv(self.portfolio_dir / 'portfolio.csv', index=False)
+
+    def get_current_equity(self):
+        return self._equity
+
+    def is_bankrupt(self):
+        return self._bankrupt
+
     def visualize_equity(self):
         px.line(self._portfolio_history, x='timestamp', y='equity', markers=True).write_html(self.portfolio_dir / "equity.html")

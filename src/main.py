@@ -16,3 +16,5 @@ def start():
         end = '2023-12-31 23:59:59'
         main_backtest.run(data_type, _start, end)
     print("Thank you for using Alpha9!")
+
+start()

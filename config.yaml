@@ -90,3 +90,6 @@ strategy:
 
   # other constants related to strategy package
   sequence_length: 2
+
+  # constants related to environment
+  max_episode_steps: 3000
